@@ -145,7 +145,7 @@ Parameters:
 --threads {threads}: Sets the number of CPU threads to be used.
 --cpu: Forces the job to run on CPU rather than GPU.
 
-
+------------------------------------------------------------------------------------------------------------------------------------------
 {params.cat12_dir}/cat_batch_cat.sh {input.t1} -p 1 {params.fg} --matlab {params.matlab} --defaults {params.default} {params.no_surf} {params.rp} --bids_folder {params.bids_folder_cross} --logdir {params.log_folder}
 
 Description: This command runs CAT12, a toolbox for automated MRI segmentation and morphometry analysis.
@@ -162,6 +162,8 @@ Parameters:
 --bids_folder {params.bids_folder_cross}: Specifies the output directory in BIDS format.
 --logdir {params.log_folder}: Specifies the log directory.
 
+-----------------------------------------------------------------------------------------------------------------------------------------
+
 recon-all -s {params.ses_id} -i {input.source} -sd {params.result_path} -cw256 -all
 Description: This command runs Freesurfer’s recon-all tool for cortical surface reconstruction and brain segmentation from an MRI image.
 
@@ -172,6 +174,8 @@ Parameters:
 -cw256: Resamples the input image to 256x256 voxels.
 -all: Runs all the standard recon-all processing stages (skull stripping, segmentation, surface reconstruction, etc.).
 
+----------------------------------------------------------------------------------------------------------------------------------------
+
 recon-all -long {params.session_id} {params.template_id} -sd "../derivatives/freesurfer7.4.1/{params.subject_id}" -cw256 -all
 
 Description: This command runs Freesurfer’s longitudinal pipeline for within-subject analysis across multiple time points.
@@ -181,6 +185,8 @@ Parameters:
 -sd {params.subject_id}: Specifies the output directory.
 -cw256: Resamples the image to 256x256 voxels.
 -all: Runs all Freesurfer processing steps.
+
+---------------------------------------------------------------------------------------------------------------------------------------
 
 recon-all -base {params.template_id} {params.sessions} -sd "../derivatives/freesurfer7.4.1/{params.subject_id}" -cw256 -all
 
