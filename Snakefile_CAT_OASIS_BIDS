@@ -1,5 +1,5 @@
 """
-Jussi cat_oasis_bids
+Snakefile for CAT12 processing. Assumed to be stored under scripts sub-directory
 """
 import glob
 
@@ -18,8 +18,9 @@ rule RUNCAT12:
         t1="../rawdata/{stem}.nii.gz"
     output:
         directory("../derivatives/{stem}_CAT12")
-    params: 
-        cat12_dir="/research/users/teemmaki/matlab/spm12/toolbox/cat12",
+    params:
+        # please update the directory name below
+        cat12_dir="/home/matlab/spm12/toolbox/cat12",
         matlab="matlab",
         default="cat_defaults_bids.m",
         model=2,  # set appropriate model if needed
