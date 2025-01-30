@@ -1,0 +1,48 @@
+import glob
+import os
+
+# Define subjects based on the existing directories in the BIDS structure
+subjects = [os.path.basename(path) for path in glob.glob('../derivatives/freesurfer7.4.1/sub-*')]
+
+# Define sessions
+sessions = ['M00', 'M24']
+
+rule all:
+    input:
+        expand("../derivatives/freesurfer7.4.1/{subject}/ses-{session}.long.{subject}_template_M00M24/mri/orig.mgz", 
+               subject=subjects, session=sessions)
+
+rule LongitudinalTemplate:
+    input:
+        "../derivatives/freesurfer7.4.1/{subject}/ses-{session}/mri/orig.mgz"
+    output:
+        "../derivatives/freesurfer7.4.1/{subject}/{subject}_template_M00M24/mri/orig.mgz"
+    params:
+        subject_id=lambda wildcards: wildcards.subject,
+        template_id=lambda wildcards: f"{wildcards.subject}_template_M00M24",
+        sessions=lambda wildcards: " ".join([f"-tp ses-{s}" for s in sessions])
+    shell:
+        """
+        if [ -d ../derivatives/freesurfer7.4.1/{params.subject_id}/{params.template_id} ]; then
+            rm -dr ../derivatives/freesurfer7.4.1/{params.subject_id}/{params.template_id}
+        fi
+        recon-all -base {params.template_id} {params.sessions} -sd "../derivatives/freesurfer7.4.1/{params.subject_id}" -cw256 -all
+        """
+
+rule LongitudinalProcess:
+    input:
+        template="../derivatives/freesurfer7.4.1/{subject}/{subject}_template_M00M24/mri/orig.mgz",
+        session="../derivatives/freesurfer7.4.1/{subject}/ses-{session}/mri/orig.mgz"
+    output:
+        "../derivatives/freesurfer7.4.1/{subject}/ses-{session}.long.{subject}_template_M00M24/mri/orig.mgz"
+    params:
+        subject_id=lambda wildcards: wildcards.subject,
+        session_id=lambda wildcards: f"ses-{wildcards.session}",
+        template_id=lambda wildcards: f"{wildcards.subject}_template_M00M24"
+    shell:
+        """
+        if [ -d {output} ]; then
+            rm -dr {output}
+        fi
+        recon-all -long {params.session_id} {params.template_id} -sd "../derivatives/freesurfer7.4.1/{params.subject_id}" -cw256 -all
+        """
