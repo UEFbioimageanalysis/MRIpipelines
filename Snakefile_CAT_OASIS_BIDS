@@ -1,0 +1,39 @@
+"""
+Jussi cat_oasis_bids
+"""
+import glob
+
+# Define paths to input T1w files and corresponding output stems
+ANAT_FILES = sorted(glob.glob('../rawdata/sub-*/ses-*/anat/*T1*.nii.gz'))
+DERIVATIVE_STEMS = [file.replace('../rawdata/', '').replace('.nii.gz', '') for file in ANAT_FILES]
+
+# Rule to run all processes
+rule all:
+    input:
+        expand("../derivatives/{stem}_CAT12", stem=DERIVATIVE_STEMS)
+
+# Rule for CAT12 processing
+rule RUNCAT12:
+    input:
+        t1="../rawdata/{stem}.nii.gz"
+    output:
+        directory("../derivatives/{stem}_CAT12")
+    params: 
+        cat12_dir="/research/users/teemmaki/matlab/spm12/toolbox/cat12",
+        matlab="matlab",
+        default="cat_defaults_bids.m",
+        model=2,  # set appropriate model if needed
+        no_surf="",  # modify if needed
+        export_dartel=" --export-dartel ",
+        rp=" --rp ",
+        fg=" --fg ",
+        log_folder="../derivatives/{stem}_CAT12/log",
+        bids_folder_cross="../derivatives/{stem}_CAT12/cross",
+        bids_folder_long="../derivatives/{stem}_CAT12/long"
+    shell:
+        """
+        mkdir -p {params.log_folder}
+        mkdir -p {params.bids_folder_cross}
+        mkdir -p {params.bids_folder_long}
+        {params.cat12_dir}/cat_batch_cat.sh {input.t1} -p 1 {params.fg} --matlab {params.matlab} --defaults {params.default} {params.no_surf} {params.rp} --bids_folder {params.bids_folder_cross} --logdir {params.log_folder}
+        """

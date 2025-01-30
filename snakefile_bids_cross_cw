@@ -1,0 +1,27 @@
+"""
+Jussi fs_finger_batch_bids_cross_cw
+"""
+
+
+import glob
+
+ANAT_FILES = sorted(glob.glob('../rawdata/sub*/ses*/anat/sub*T1w.nii.gz'))
+DERIVATIVE_STEMS = [file.replace('rawdata', 'derivatives').replace('.nii.gz', '') for file in ANAT_FILES]
+
+rule RunAll:
+    input:
+        expand("{file}_freesurf/subject/wm.mgz", file=DERIVATIVE_STEMS)
+
+rule BidsCross:
+    input: 
+        source="../rawdata/{stem}.nii.gz"
+    output:
+        "../derivatives/{stem}_freesurf/subject/wm.mgz"
+    params:
+        result_path = lambda wildcards: "../derivatives/{}/freesurf/".format(wildcards.stem),
+        ses_id = lambda wildcards: wildcards.stem.split('/')[0]
+    shell:
+        """
+        mkdir -p {params.result_path}
+        recon-all -s {params.ses_id} -i {input.source} -sd {params.result_path} -cw256 -all
+        """
