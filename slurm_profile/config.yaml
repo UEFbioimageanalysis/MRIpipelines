@@ -1,0 +1,15 @@
+cluster: "sbatch --account={resources.slurm_account} --mem={resources.mem_mb} --time={resources.runtime} -c {resources.cores} --partition={resources.partition}"
+
+default-resources:
+  - mem_mb=5000
+  - disk_mb=5000
+  - runtime=800
+  - cores=10
+  - partition="name_of_the_partition"
+jobs: 20
+cores: 10
+latency-wait: 120
+
+envmodules:
+  - matlab
+  - freesurfer
